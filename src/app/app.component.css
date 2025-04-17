@@ -1,0 +1,10 @@
+a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  
+  a.active {
+    color: #007bff;
+  }
+  
