@@ -1,3 +1,31 @@
-<p>login works!</p>
-<h1>BIENVENIDO A LOGIN</h1>
-<p>Este es el componente de login funcionando correctamente 🎉</p>
+<mat-card class="login-card">
+  <mat-card-header>
+    <mat-card-title>Iniciar sesión</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form (ngSubmit)="onSubmit()">
+      <!-- Campo de email -->
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" [(ngModel)]="email" name="email" required>
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
+
+      <!-- Campo de contraseña -->
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input matInput type="password" [(ngModel)]="password" name="password" required>
+        <mat-icon matSuffix>lock</mat-icon>
+      </mat-form-field>
+
+      <!-- Checkbox "Recordar" -->
+      <mat-checkbox>Recordar sesión</mat-checkbox>
+
+      <!-- Botón de submit -->
+      <button mat-raised-button color="primary" type="submit">Ingresar</button>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <a mat-button routerLink="/registro">¿No tienes cuenta? Regístrate</a>
+  </mat-card-actions>
+</mat-card>
