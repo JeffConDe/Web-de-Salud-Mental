@@ -1,31 +1,27 @@
-<mat-card class="login-card">
-  <mat-card-header>
-    <mat-card-title>Iniciar sesión</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <form (ngSubmit)="onSubmit()">
-      <!-- Campo de email -->
-      <mat-form-field appearance="outline">
-        <mat-label>Email</mat-label>
-        <input matInput type="email" [(ngModel)]="email" name="email" required>
-        <mat-icon matSuffix>email</mat-icon>
-      </mat-form-field>
+<section class="auth-page">
+  <div class="auth-card">
+    <a class="back-link" routerLink="/">← Volver al inicio</a>
+    <p class="eyebrow">Qué bueno verte</p>
+    <h1>Inicia sesión</h1>
+    <p class="subtitle">Continúa tu recorrido de bienestar.</p>
 
-      <!-- Campo de contraseña -->
-      <mat-form-field appearance="outline">
-        <mat-label>Contraseña</mat-label>
-        <input matInput type="password" [(ngModel)]="password" name="password" required>
-        <mat-icon matSuffix>lock</mat-icon>
-      </mat-form-field>
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <label for="email">Correo electrónico</label>
+      <input id="email" type="email" name="email" [(ngModel)]="email" placeholder="tu@correo.com" autocomplete="email" required>
 
-      <!-- Checkbox "Recordar" -->
-      <mat-checkbox>Recordar sesión</mat-checkbox>
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" name="password" [(ngModel)]="password" placeholder="Tu contraseña" autocomplete="current-password" required>
 
-      <!-- Botón de submit -->
-      <button mat-raised-button color="primary" type="submit">Ingresar</button>
+      <button class="button submit-button" type="submit" [disabled]="loginForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Ingresando...' : 'Iniciar sesión' }}
+      </button>
     </form>
-  </mat-card-content>
-  <mat-card-actions>
-    <a mat-button routerLink="/registro">¿No tienes cuenta? Regístrate</a>
-  </mat-card-actions>
-</mat-card>
+
+    @if (message) {
+      <p class="form-message" role="status">{{ message }}</p>
+    }
+
+    <p class="switch-auth">¿Aún no tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+    <p class="demo-note">Usa datos de prueba mientras ejecutas el backend local de desarrollo.</p>
+  </div>
+</section>

@@ -1,59 +1,75 @@
-# SaludMentalWebApp
+# Salud Mental
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.8.
+Aplicación de bienestar emocional en desarrollo. El repositorio contiene un frontend Angular y una API Laravel con PostgreSQL.
 
-## Development server
+## Requisitos
 
-To start a local development server, run:
+- Node.js y npm
+- Docker Desktop iniciado
 
-```bash
-ng serve
+No hace falta instalar PHP, Composer ni PostgreSQL directamente en el equipo.
+
+## Iniciar el backend
+
+Desde la raíz del repositorio, prepara la configuración local:
+
+```powershell
+Copy-Item backend\.env.example backend\.env
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+En macOS o Linux, usa `cp backend/.env.example backend/.env`.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Construye e inicia Laravel y PostgreSQL:
 
 ```bash
-ng generate component component-name
+docker compose up --build -d
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La API queda en `http://localhost:8000`. El endpoint `http://localhost:8000/api/health` verifica que responde.
+
+Si cambias dependencias PHP, sincroniza `composer.lock` y el volumen del contenedor con:
 
 ```bash
-ng generate --help
+docker compose exec app composer install
 ```
 
-## Building
+## Iniciar el frontend
 
-To build the project run:
+En otra terminal:
 
 ```bash
-ng build
+npm install
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Abre `http://localhost:4200/`.
 
-## Running unit tests
+## Funciones disponibles
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- Registro e inicio de sesión con tokens revocables.
+- Perfil para consultar y actualizar nombre y correo.
+- Chat autenticado que conserva una conversación por cuenta y responde con un mensaje automático fijo.
+- Las rutas de chat y perfil requieren inicio de sesión.
+
+Para probar en local, los mensajes se guardan en PostgreSQL. **No uses datos personales o clínicos reales**: esta configuración es de desarrollo y todavía no incluye controles de producción, política de retención ni despliegue seguro. El chat no usa IA ni ofrece atención profesional.
+
+El token se guarda en `sessionStorage` y caduca al cerrar la pestaña; es una medida de desarrollo, no una decisión final para producción.
+
+## Datos y cambios de base
+
+Laravel crea y cambia las tablas mediante migraciones:
 
 ```bash
-ng test
+docker compose exec app php artisan migrate
 ```
 
-## Running end-to-end tests
+Cada integrante ejecuta las migraciones en su propia base. El volumen `postgres_data` conserva datos al reiniciar; `docker compose down -v` los elimina.
 
-For end-to-end (e2e) testing, run:
+## Pruebas
 
 ```bash
-ng e2e
+docker compose exec app php artisan test
+npm run build
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

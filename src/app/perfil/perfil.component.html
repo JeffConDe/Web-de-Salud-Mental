@@ -1,3 +1,22 @@
-<p>perfil works!</p>
-<h1>BIENVENIDO A PERFIl</h1>
-<p>Este es el componente de perfil funcionando correctamente 🎉</p>
+<section class="profile-page">
+  <div class="profile-card">
+    <div class="profile-icon" aria-hidden="true">♡</div>
+    <p class="eyebrow">Tu espacio personal</p>
+    <h1>Mi perfil</h1>
+    <p>Actualiza los datos básicos de tu cuenta.</p>
+    <form (ngSubmit)="save()" #profileForm="ngForm">
+      <label for="profile-name">Nombre</label>
+      <input id="profile-name" type="text" name="name" [(ngModel)]="name" autocomplete="name" maxlength="100" required>
+
+      <label for="profile-email">Correo electrónico</label>
+      <input id="profile-email" type="email" name="email" [(ngModel)]="email" autocomplete="email" maxlength="255" required>
+
+      <button class="button" type="submit" [disabled]="profileForm.invalid || isSaving">
+        {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </form>
+    @if (message) {
+      <p class="profile-message" role="status">{{ message }}</p>
+    }
+  </div>
+</section>

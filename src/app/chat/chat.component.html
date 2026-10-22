@@ -1,1 +1,45 @@
-<p>chat works!</p>
+<section class="chat-page">
+  <div class="chat-heading">
+    <p class="eyebrow">Un espacio de escucha</p>
+    <h1>Chat de apoyo</h1>
+    <p>Un lugar tranquilo para poner en palabras lo que tienes en mente.</p>
+  </div>
+
+  <div class="demo-banner" role="note">
+    <span aria-hidden="true">ⓘ</span>
+    Los mensajes se guardan en tu cuenta. La respuesta es automática y no proviene de un profesional ni sustituye atención clínica.
+  </div>
+
+  <section class="chat-card" aria-label="Conversación">
+    <div class="chat-messages" aria-live="polite" aria-relevant="additions">
+      @if (isLoading) {
+        <p class="chat-status" role="status">Cargando tu conversación...</p>
+      } @else if (messages.length === 0) {
+        <div class="message-row">
+          <span class="assistant-avatar" aria-hidden="true">s</span>
+          <p class="message-bubble">Hola. Este es un espacio de escucha con respuestas automáticas sencillas. ¿Qué te gustaría expresar hoy?</p>
+        </div>
+      }
+      @for (item of messages; track $index) {
+        <div class="message-row" [class.user-row]="item.sender === 'user'">
+          @if (item.sender === 'assistant') {
+            <span class="assistant-avatar" aria-hidden="true">s</span>
+          }
+          <p class="message-bubble" [class.user-bubble]="item.sender === 'user'">{{ item.content }}</p>
+        </div>
+      }
+      @if (errorMessage) {
+        <p class="chat-error" role="alert">{{ errorMessage }} <button type="button" (click)="loadMessages()">Reintentar</button></p>
+      }
+    </div>
+    <form class="message-form" (ngSubmit)="sendMessage()">
+      <label class="visually-hidden" for="chat-message">Escribe un mensaje</label>
+      <input id="chat-message" type="text" name="message" [(ngModel)]="message" placeholder="Escribe lo que quieras compartir..." autocomplete="off" maxlength="2000" [disabled]="isLoading || isSending">
+      <button class="send-button" type="submit" [disabled]="!message.trim() || isLoading || isSending" aria-label="Enviar mensaje">
+        {{ isSending ? 'Enviando...' : 'Enviar' }} <span aria-hidden="true">→</span>
+      </button>
+    </form>
+  </section>
+
+  <p class="support-note">Si necesitas ayuda urgente, contacta los servicios de emergencia de tu localidad o a alguien de confianza.</p>
+</section>

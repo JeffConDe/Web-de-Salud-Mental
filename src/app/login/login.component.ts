@@ -1,31 +1,37 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon'; 
+import { HttpErrorResponse } from '@angular/common/http';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../core/auth.service';
+import { apiErrorMessage } from '../core/api-error';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [
-    FormsModule,
-    MatCardModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatIconModule  
-  ],
+  imports: [FormsModule, RouterLink],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrl: './login.component.css'
 })
 export class LoginComponent {
   email: string = '';
   password: string = '';
+  message = '';
+  isSubmitting = false;
 
-  onSubmit() {
-    console.log('Datos enviados:', { email: this.email, password: this.password });
-    // Aquí luego conectarás con Laravel
+  constructor(private readonly auth: AuthService, private readonly router: Router) {}
+
+  onSubmit(): void {
+    this.isSubmitting = true;
+    this.message = '';
+
+    this.auth.login(this.email, this.password).subscribe({
+      next: () => this.router.navigate(['/chat']),
+      error: (error: HttpErrorResponse) => {
+        this.message = apiErrorMessage(error, 'No se pudo iniciar sesión. Comprueba tu conexión e inténtalo de nuevo.');
+        this.isSubmitting = false;
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      },
+    });
   }
 }

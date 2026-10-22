@@ -1,16 +1,127 @@
-.login-card {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 2rem;
-    text-align: center;
-  }
-  
-  mat-form-field {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  
-  button[mat-raised-button] {
-    width: 100%;
-    margin-top: 1rem;
-  }
+.auth-page {
+  align-items: center;
+  background: #f5f8f4;
+  display: flex;
+  justify-content: center;
+  min-height: 650px;
+  padding: 3rem 1.25rem;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid #e8eee9;
+  border-radius: 22px;
+  box-shadow: 0 18px 55px #263e3510;
+  max-width: 440px;
+  padding: clamp(1.6rem, 5vw, 2.7rem);
+  width: 100%;
+}
+
+.back-link {
+  color: #5c7868;
+  display: inline-block;
+  font-size: 0.88rem;
+  margin-bottom: 2rem;
+  text-decoration: none;
+}
+
+.eyebrow {
+  color: #4b8a69;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.55rem;
+  text-transform: uppercase;
+}
+
+h1 {
+  color: #293f36;
+  font-size: 2rem;
+  letter-spacing: -0.05em;
+  margin: 0;
+}
+
+.subtitle {
+  color: #718078;
+  margin: 0.5rem 0 1.8rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  color: #40574c;
+  font-size: 0.88rem;
+  font-weight: 650;
+  margin: 0 0 0.45rem;
+}
+
+input {
+  background: #fff;
+  border: 1px solid #dbe4dd;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #293f36;
+  font: inherit;
+  margin: 0 0 1.15rem;
+  min-height: 48px;
+  padding: 0.75rem 0.9rem;
+  width: 100%;
+}
+
+input:focus {
+  border-color: #579675;
+  outline: 3px solid #5796752b;
+}
+
+input::placeholder {
+  color: #9aa7a0;
+}
+
+.submit-button {
+  border: 0;
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+  min-height: 48px;
+}
+
+.submit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.switch-auth {
+  color: #64756c;
+  font-size: 0.9rem;
+  margin: 1.4rem 0 0;
+  text-align: center;
+}
+
+.switch-auth a {
+  color: #34765a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.demo-note,
+.form-message {
+  border-radius: 9px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  padding: 0.75rem;
+}
+
+.demo-note {
+  background: #f4f6f4;
+  color: #6d7a73;
+  margin: 1.2rem 0 0;
+  text-align: center;
+}
+
+.form-message {
+  background: #edf6ef;
+  color: #356c4c;
+  margin: 1rem 0 0;
+}

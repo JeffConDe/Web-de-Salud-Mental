@@ -1,9 +1,36 @@
 
-<nav>
-  <a routerLink="/" routerLinkActive="active">Inicio</a> |
-  <a routerLink="/login" routerLinkActive="active">Login</a> |
-  <a routerLink="/registro" routerLinkActive="active">Registro</a> |
-  <a routerLink="/chat" routerLinkActive="active">Chat</a>
-</nav>
-<hr>
-<router-outlet></router-outlet>
+<header class="site-header">
+  <a class="brand" routerLink="/" aria-label="Salud Mental, ir al inicio">
+    <span class="brand-mark" aria-hidden="true">s</span>
+    <span>salud<span class="brand-accent">mente</span></span>
+  </a>
+
+  <nav class="main-nav" aria-label="Navegación principal">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <a routerLink="/chat" routerLinkActive="active">Chat de apoyo</a>
+    <a routerLink="/perfil" routerLinkActive="active">Mi perfil</a>
+  </nav>
+
+  <div class="header-actions">
+    @if (auth.currentUser$ | async; as user) {
+      <span class="welcome-user">Hola, {{ user.name }}</span>
+      <button class="login-link logout-button" type="button" (click)="logout()">Cerrar sesión</button>
+    } @else {
+      <a class="login-link" routerLink="/login">Iniciar sesión</a>
+      <a class="button button-small" routerLink="/registro">Crear cuenta</a>
+    }
+  </div>
+</header>
+
+@if (sessionMessage) {
+  <p class="session-message" role="alert">{{ sessionMessage }}</p>
+}
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="site-footer">
+  <span>Un espacio para cuidar de ti, paso a paso.</span>
+  <span class="footer-note">Este sitio es una demostración y no sustituye la atención profesional.</span>
+</footer>
