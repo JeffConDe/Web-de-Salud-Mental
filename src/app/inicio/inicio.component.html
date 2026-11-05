@@ -6,9 +6,18 @@
       Explora recursos, expresa cómo te sientes y da pequeños pasos hacia el cuidado de tu salud mental.
     </p>
     <div class="hero-actions">
-      <a class="button" routerLink="/registro">Comenzar ahora <span aria-hidden="true">→</span></a>
+      @if (auth.currentUser$ | async; as user) {
+        <a class="button" routerLink="/perfil">Ir a mi perfil <span aria-hidden="true">→</span></a>
+        <button class="button button-outline" type="button" (click)="logout()">Cerrar sesión</button>
+      } @else {
+        <a class="button" routerLink="/login">Iniciar sesión <span aria-hidden="true">→</span></a>
+        <a class="button button-outline" routerLink="/registro">Crear cuenta</a>
+      }
       <a class="text-link" routerLink="/chat">Conocer el chat de apoyo</a>
     </div>
+    @if (sessionMessage) {
+      <p class="session-message" role="alert">{{ sessionMessage }}</p>
+    }
     <p class="privacy-note"><span aria-hidden="true">♡</span> Avanza a tu ritmo, sin juicios.</p>
   </div>
   <div class="hero-art" aria-label="Ilustración decorativa de hojas y formas suaves" role="img">

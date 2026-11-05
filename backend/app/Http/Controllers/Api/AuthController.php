@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,7 +23,10 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)->max(72)],
         ]);
 
-        $user = User::create($validated);
+        $user = User::create([
+            ...$validated,
+            'role' => UserRole::Patient,
+        ]);
 
         return response()->json([
             'user' => $this->userData($user),
@@ -71,6 +75,7 @@ class AuthController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'role' => $user->role->value,
         ];
     }
 }

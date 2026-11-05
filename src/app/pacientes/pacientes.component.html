@@ -1,0 +1,105 @@
+<section class="patients-page">
+  <header class="page-heading">
+    <p class="eyebrow">Gestión de atención</p>
+    <h1>Pacientes</h1>
+    <p>Administra los datos básicos de pacientes del centro.</p>
+  </header>
+
+  @if (errorMessage) {
+    <p class="feedback error" role="alert">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="feedback success" role="status">{{ successMessage }}</p>
+  }
+
+  <div class="patients-layout">
+    <section class="panel patient-form-panel">
+      <h2>{{ editingId === null ? 'Registrar paciente' : 'Editar paciente' }}</h2>
+      <p class="panel-description">El documento identifica el registro dentro del centro.</p>
+
+      <form (ngSubmit)="save()" #patientForm="ngForm">
+        <label for="patient-document">Documento</label>
+        <input id="patient-document" name="document" [(ngModel)]="form.document" maxlength="30" autocomplete="off" required>
+
+        <label for="patient-name">Nombre completo</label>
+        <input id="patient-name" name="name" [(ngModel)]="form.name" maxlength="100" autocomplete="name" required>
+
+        <label for="patient-phone">Teléfono <span>(opcional)</span></label>
+        <input id="patient-phone" name="phone" [(ngModel)]="form.phone" maxlength="30" autocomplete="tel">
+
+        <label for="patient-email">Correo <span>(opcional)</span></label>
+        <input id="patient-email" name="email" type="email" [(ngModel)]="form.email" maxlength="255" autocomplete="email">
+
+        <div class="form-actions">
+          <button class="button" type="submit" [disabled]="patientForm.invalid || isSaving">
+            {{ isSaving ? 'Guardando...' : editingId === null ? 'Registrar paciente' : 'Guardar cambios' }}
+          </button>
+          @if (editingId !== null) {
+            <button class="secondary-button" type="button" (click)="cancelEdit()">Cancelar</button>
+          }
+        </div>
+      </form>
+    </section>
+
+    <section class="panel patient-list-panel" aria-label="Lista de pacientes">
+      <div class="list-heading">
+        <div>
+          <h2>Directorio</h2>
+          <p class="panel-description">{{ total }} registro{{ total === 1 ? '' : 's' }}</p>
+        </div>
+        <form class="search-form" (ngSubmit)="searchPatients()">
+          <label class="visually-hidden" for="patient-search">Buscar pacientes</label>
+          <input id="patient-search" name="search" [(ngModel)]="search" placeholder="Nombre, documento..." autocomplete="off">
+          <button class="secondary-button" type="submit">Buscar</button>
+        </form>
+      </div>
+
+      @if (isLoading) {
+        <p class="empty-state" role="status">Cargando pacientes...</p>
+      } @else if (patients.length === 0) {
+        <p class="empty-state">No hay pacientes para mostrar. Puedes registrar el primero.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Paciente</th>
+                <th scope="col">Documento</th>
+                <th scope="col">Contacto</th>
+                <th scope="col"><span class="visually-hidden">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (patient of patients; track patient.id) {
+                <tr>
+                  <td data-label="Paciente">{{ patient.name }}</td>
+                  <td data-label="Documento">{{ patient.document }}</td>
+                  <td data-label="Contacto">
+                    {{ patient.phone || '—' }}
+                    @if (patient.email) {
+                      <span class="contact-email">{{ patient.email }}</span>
+                    }
+                  </td>
+                  <td class="row-actions">
+                    <button class="table-action" type="button" (click)="edit(patient)">Editar</button>
+                    <button class="table-action delete-action" type="button" (click)="delete(patient)">Archivar</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (lastPage > 1) {
+        <nav class="pagination" aria-label="Paginación de pacientes">
+          <button class="secondary-button" type="button" [disabled]="currentPage <= 1 || isLoading" (click)="changePage(currentPage - 1)">Anterior</button>
+          <span>Página {{ currentPage }} de {{ lastPage }}</span>
+          <button class="secondary-button" type="button" [disabled]="currentPage >= lastPage || isLoading" (click)="changePage(currentPage + 1)">Siguiente</button>
+        </nav>
+      }
+    </section>
+  </div>
+
+  <p class="privacy-note">Usa datos de prueba. Los registros archivados dejan de aparecer en el directorio, pero permanecen en la base de desarrollo.</p>
+</section>

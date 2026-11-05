@@ -19,8 +19,10 @@ class ApiAccountAndChatTest extends TestCase
             'email' => 'ANA@example.com',
             'password' => 'A-secure-password-123',
             'password_confirmation' => 'A-secure-password-123',
+            'role' => 'administrator',
         ])->assertCreated()
             ->assertJsonPath('user.email', 'ana@example.com')
+            ->assertJsonPath('user.role', 'patient')
             ->assertJsonMissingPath('user.password');
 
         $user = User::where('email', 'ana@example.com')->firstOrFail();

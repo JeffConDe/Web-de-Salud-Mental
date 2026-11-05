@@ -1,0 +1,224 @@
+<section class="clinic-page">
+  <header class="page-heading">
+    <p class="eyebrow">Directorio de atención</p>
+    <h1>Médicos y horarios</h1>
+    <p>Consulta especialidades, perfiles profesionales y disponibilidad semanal.</p>
+  </header>
+
+  @if (errorMessage) {
+    <p class="feedback error" role="alert">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="feedback success" role="status">{{ successMessage }}</p>
+  }
+
+  @if (isAdministrator) {
+    <div class="management-grid">
+      <section class="panel">
+        <h2>{{ editingDoctorId === null ? 'Registrar médico' : 'Editar perfil médico' }}</h2>
+        <p class="panel-description">La cuenta se crea con rol médico y queda asociada a una especialidad.</p>
+        <form (ngSubmit)="saveDoctor()" #doctorFormRef="ngForm">
+          <label for="doctor-name">Nombre completo</label>
+          <input id="doctor-name" name="doctorName" [(ngModel)]="doctorForm.name" maxlength="100" required>
+
+          <label for="doctor-email">Correo de acceso</label>
+          <input id="doctor-email" name="doctorEmail" type="email" [(ngModel)]="doctorForm.email" maxlength="255" required>
+
+          @if (editingDoctorId === null) {
+            <label for="doctor-password">Contraseña inicial</label>
+            <input id="doctor-password" name="doctorPassword" type="password" [(ngModel)]="doctorForm.password" minlength="8" required autocomplete="new-password">
+            <label for="doctor-password-confirmation">Confirmar contraseña</label>
+            <input id="doctor-password-confirmation" name="doctorPasswordConfirmation" type="password" [(ngModel)]="doctorForm.password_confirmation" minlength="8" required autocomplete="new-password">
+          }
+
+          <label for="doctor-specialty">Especialidad</label>
+          <select id="doctor-specialty" name="doctorSpecialty" [(ngModel)]="doctorForm.specialty_id" required>
+            <option [ngValue]="0" disabled>Selecciona una especialidad</option>
+            @for (specialty of specialties; track specialty.id) {
+              @if (specialty.active) {
+                <option [ngValue]="specialty.id">{{ specialty.name }}</option>
+              }
+            }
+          </select>
+
+          <label for="doctor-license">Número de tarjeta profesional</label>
+          <input id="doctor-license" name="doctorLicense" [(ngModel)]="doctorForm.license_number" maxlength="50" required>
+
+          <label for="doctor-biography">Descripción <span>(opcional)</span></label>
+          <textarea id="doctor-biography" name="doctorBiography" [(ngModel)]="doctorForm.biography" maxlength="2000" rows="3"></textarea>
+
+          @if (editingDoctorId !== null) {
+            <label class="checkbox-label">
+              <input name="doctorActive" type="checkbox" [(ngModel)]="doctorForm.active">
+              Perfil activo
+            </label>
+          }
+
+          <div class="form-actions">
+            <button class="button" type="submit" [disabled]="doctorFormRef.invalid || isSaving || doctorForm.specialty_id === 0">
+              {{ isSaving ? 'Guardando...' : editingDoctorId === null ? 'Registrar médico' : 'Guardar cambios' }}
+            </button>
+            @if (editingDoctorId !== null) {
+              <button class="secondary-button" type="button" (click)="cancelDoctorEdit()">Cancelar</button>
+            }
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>{{ editingSpecialtyId === null ? 'Especialidades' : 'Editar especialidad' }}</h2>
+        <p class="panel-description">Las especialidades con médicos asociados no se pueden archivar.</p>
+        <form class="specialty-form" (ngSubmit)="saveSpecialty()" #specialtyFormRef="ngForm">
+          <label for="specialty-name">Nombre</label>
+          <input id="specialty-name" name="specialtyName" [(ngModel)]="specialtyForm.name" maxlength="100" required>
+          <label for="specialty-description">Descripción <span>(opcional)</span></label>
+          <textarea id="specialty-description" name="specialtyDescription" [(ngModel)]="specialtyForm.description" maxlength="2000" rows="2"></textarea>
+          <div class="form-actions">
+            <button class="button" type="submit" [disabled]="specialtyFormRef.invalid || isSaving">
+              {{ editingSpecialtyId === null ? 'Crear especialidad' : 'Guardar cambios' }}
+            </button>
+            @if (editingSpecialtyId !== null) {
+              <button class="secondary-button" type="button" (click)="cancelSpecialtyEdit()">Cancelar</button>
+            }
+          </div>
+        </form>
+
+        @if (specialties.length === 0) {
+          <p class="empty-state">Todavía no hay especialidades.</p>
+        } @else {
+          <ul class="specialty-list">
+            @for (specialty of specialties; track specialty.id) {
+              <li>
+                <span>
+                  <strong>{{ specialty.name }}</strong>
+                  @if (!specialty.active) {
+                    <small>Archivada</small>
+                  }
+                </span>
+                @if (specialty.active) {
+                  <span class="row-actions">
+                    <button class="table-action" type="button" (click)="editSpecialty(specialty)">Editar</button>
+                    <button class="table-action delete-action" type="button" (click)="archiveSpecialty(specialty)">Archivar</button>
+                  </span>
+                } @else {
+                  <button class="table-action" type="button" (click)="activateSpecialty(specialty)">Activar</button>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  }
+
+  <section class="panel directory-panel" aria-label="Directorio de médicos">
+    <div class="list-heading">
+      <div>
+        <h2>Directorio médico</h2>
+        <p class="panel-description">{{ doctors.length }} médico{{ doctors.length === 1 ? '' : 's' }}</p>
+      </div>
+      <form class="search-form" (ngSubmit)="searchDoctors()">
+        <label class="visually-hidden" for="doctor-search">Buscar médico o especialidad</label>
+        <input id="doctor-search" name="search" [(ngModel)]="search" placeholder="Médico o especialidad..." autocomplete="off">
+        <button class="secondary-button" type="submit">Buscar</button>
+      </form>
+    </div>
+
+    @if (isLoading) {
+      <p class="empty-state" role="status">Cargando directorio...</p>
+    } @else if (doctors.length === 0) {
+      <p class="empty-state">No hay perfiles médicos para mostrar.</p>
+    } @else {
+      <div class="doctor-grid">
+        @for (doctor of doctors; track doctor.id) {
+          <article class="doctor-card">
+            <div class="doctor-heading">
+              <div>
+                <p class="doctor-specialty">{{ doctor.specialty.name }}</p>
+                <h3>{{ doctor.name }}</h3>
+                <p class="doctor-email">{{ doctor.email }}</p>
+              </div>
+              @if (!doctor.active) {
+                <small>Inactivo</small>
+              }
+            </div>
+            <p class="license">Tarjeta profesional: {{ doctor.license_number }}</p>
+            @if (doctor.biography) {
+              <p class="biography">{{ doctor.biography }}</p>
+            }
+
+            @if (isAdministrator) {
+              <div class="card-actions">
+                <button class="table-action" type="button" (click)="editDoctor(doctor)">Editar perfil</button>
+                <button class="table-action" type="button" (click)="toggleDoctor(doctor)">
+                  {{ doctor.active ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div>
+            }
+
+            <div class="schedule-heading">
+              <h4>Disponibilidad semanal</h4>
+              @if (canManageSchedules(doctor) && doctor.active) {
+                <button class="table-action" type="button" (click)="openScheduleForm(doctor.id)">
+                  {{ schedulingDoctorId === doctor.id ? 'Cancelar' : 'Agregar horario' }}
+                </button>
+              }
+            </div>
+
+            @if (doctor.schedules.length === 0) {
+              <p class="schedule-empty">Sin horarios registrados.</p>
+            } @else {
+              <ul class="schedule-list">
+                @for (schedule of doctor.schedules; track schedule.id) {
+                  <li>
+                    <span>
+                      {{ weekdays[schedule.day_of_week] }}
+                      <strong>{{ schedule.start_time }}–{{ schedule.end_time }}</strong>
+                      <small>{{ schedule.slot_duration_minutes }} min por cita</small>
+                    </span>
+                    @if (canManageSchedules(doctor)) {
+                      <button class="table-action delete-action" type="button" (click)="deleteSchedule(doctor, schedule)">Eliminar</button>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (schedulingDoctorId === doctor.id) {
+              <form class="schedule-form" (ngSubmit)="saveSchedule(doctor.id)" #scheduleFormRef="ngForm">
+                <label [for]="'schedule-day-' + doctor.id">Día</label>
+                <select [id]="'schedule-day-' + doctor.id" name="scheduleDay" [(ngModel)]="scheduleForm.day_of_week" required>
+                  @for (weekday of weekdays; track $index) {
+                    <option [ngValue]="$index">{{ weekday }}</option>
+                  }
+                </select>
+                <div class="time-fields">
+                  <div>
+                    <label [for]="'schedule-start-' + doctor.id">Desde</label>
+                    <input [id]="'schedule-start-' + doctor.id" name="scheduleStart" type="time" [(ngModel)]="scheduleForm.start_time" required>
+                  </div>
+                  <div>
+                    <label [for]="'schedule-end-' + doctor.id">Hasta</label>
+                    <input [id]="'schedule-end-' + doctor.id" name="scheduleEnd" type="time" [(ngModel)]="scheduleForm.end_time" required>
+                  </div>
+                </div>
+                <label [for]="'schedule-slot-' + doctor.id">Duración de cada cita</label>
+                <select [id]="'schedule-slot-' + doctor.id" name="scheduleSlot" [(ngModel)]="scheduleForm.slot_duration_minutes" required>
+                  <option [ngValue]="15">15 minutos</option>
+                  <option [ngValue]="30">30 minutos</option>
+                  <option [ngValue]="45">45 minutos</option>
+                  <option [ngValue]="60">60 minutos</option>
+                </select>
+                <button class="button" type="submit" [disabled]="scheduleFormRef.invalid || isSaving">
+                  {{ isSaving ? 'Guardando...' : 'Guardar horario' }}
+                </button>
+              </form>
+            }
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <p class="privacy-note">Usa datos de prueba. Los horarios son semanales y todavía no descuentan citas, festivos ni ausencias.</p>
+</section>

@@ -7,7 +7,10 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
+  role: AuthRole;
 }
+
+export type AuthRole = 'administrator' | 'receptionist' | 'doctor' | 'patient';
 
 interface AuthResponse {
   user: AuthUser;

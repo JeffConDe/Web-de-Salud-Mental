@@ -9,6 +9,14 @@
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
     <a routerLink="/chat" routerLinkActive="active">Chat de apoyo</a>
     <a routerLink="/perfil" routerLinkActive="active">Mi perfil</a>
+    @if (auth.currentUser$ | async; as user) {
+      @if (user.role === 'administrator' || user.role === 'receptionist') {
+        <a routerLink="/pacientes" routerLinkActive="active">Pacientes</a>
+      }
+      @if (user.role === 'administrator' || user.role === 'receptionist' || user.role === 'doctor') {
+        <a routerLink="/medicos" routerLinkActive="active">Médicos</a>
+      }
+    }
   </nav>
 
   <div class="header-actions">
